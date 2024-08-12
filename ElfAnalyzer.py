@@ -316,7 +316,7 @@ class DataToCClass:
 
         return type(data[::-1] if DataToCClass.order == "little" else data)
 
-    def data_to_int(type: type, data: Union[bytes, int, None]) -> _SimpleCData:
+    def data_to_int(arg_type: type, data: Union[bytes, int, None]) -> _SimpleCData:
         """
         This method converts bytes, int or None to ctypes
         (c_bool, c_byte, c_ubyte, c_short, c_ushort, c_int,
@@ -327,11 +327,16 @@ class DataToCClass:
         """
 
         if isinstance(data, bytes):
-            data = int.from_bytes(
-                data[::-1] if DataToCClass.order == "little" else data
-            )
+            # python3 not support this, 
+            # int.from_bytes, arg2 "byteorder" is required
+            # data = int.from_bytes(
+            #     data[::-1] if DataToCClass.order == "little" else data
+            # )
+            data = int.from_bytes(data, byteorder="little")
+        else:
+            data = int.from_bytes(data, byteorder="big")
 
-        return type(data)
+        return arg_type(data)
 
     def data_to_str(
         type: type, data: Union[bytes, str], encoding: str = "utf-8"
@@ -763,9 +768,10 @@ class ProgramHeaderType(Enum):
 class ProgramHeaderFlags(Enum):
     PF_EXECUTE = 1
     PF_WRITE = 2
-    PF_READ = 3
+    PF_READ = 4 # (1<<2)
     PF_MASKOS = 0x0FF00000
     PF_MASKPROC = 0xF0000000
+
 
 
 class SectionHeaderType(Enum):
