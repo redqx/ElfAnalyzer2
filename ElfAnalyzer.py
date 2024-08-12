@@ -2139,7 +2139,7 @@ def parse_elfsections(
             dynstr_section = elf_section
 
         if elf_section.name == ".dynsym":
-            dynstr_section = elf_section
+            dynsym_section = elf_section
 
         if elf_section.name == ".comment":
             comment_section = elf_section
