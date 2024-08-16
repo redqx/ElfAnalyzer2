@@ -42,19 +42,7 @@ python3 -m pip install .
 
 ## Usages
 
-### Command line
 
-```bash
-ElfAnalyzer              # Using CLI package executable
-python3 -m ElfAnalyzer   # Using python module
-python3 ElfAnalyzer.pyz  # Using python executable
-ElfAnalyzer.exe          # Using python Windows executable
-
-./ElfAnalyzer.pyz ./local/ElfFile
-ElfAnalyzer.exe -u https://github.com/mauricelambert/FastRC4/releases/download/v0.0.1/librc4.so
-./ElfAnalyzer.pyz -v ./local/ElfFile
-python3 ElfAnalyzer.pyz -c ./local/ElfFile
-```
 
 ### Python script
 
