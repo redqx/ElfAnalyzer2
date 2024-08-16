@@ -4,7 +4,7 @@
 '''
 
 The original project: https://github.com/mauricelambert/ElfAnalyzer
-the upgraded project: https://github.com/mauricelambert/ElfAnalyzer
+the upgraded project: https://github.com/redqx/ElfAnalyzer2
 
 '''
 from ctypes import c_char_p

@@ -28,17 +28,9 @@ This package require:
 > *Matplotlib* and *EntropyAnalysis* are not installed by *ProgramExecutableAnalyzer* because this package can be installed on server without GUI.
 > You can install optinal required packages with the following command: `python3 -m pip install matplotlib EntropyAnalysis`
 
-## Installation
 
-```bash
-python3 -m pip install ElfAnalyzer
-```
 
-```bash
-git clone "https://github.com/mauricelambert/ElfAnalyzer.git"
-cd "ElfAnalyzer"
-python3 -m pip install .
-```
+
 
 ## Usages
 
@@ -49,9 +41,30 @@ python3 -m pip install .
 ```python
 from ElfAnalyzer import *
 
-file = open("./local/ElfFile", "rb")
-elfindent, elf_headers, programs_headers, elf_sections, symbols_tables, comments, note_sections, notes, dynamics, sections = parse_elffile(file)
-cli(elfindent, elf_headers, programs_headers, elf_sections, symbols_tables, comments, notes, dynamics, sections)
+file = open("test/hello.so.nosec", "rb")
+
+# 信息获取
+(
+        elf_indent,
+        elf_class,
+        elf_headers,
+        programs_headers,
+        programs_headers_organize,
+        dyn_items,
+        dyn_items_organize,
+        hash_table,
+        gnu_hash_table,
+        dynsym_cnt,
+        symbol_items,
+        symbol_list,
+        Relocation_Tables,
+        Relocation_Tables_organize
+)=parse_elffile(file)
+
+#查找函数
+[idx,sym]=mm_dlsym("worker", symbol_list['.dynamic']['list'], hash_table, gnu_hash_table,elf_class)
+
+
 file.close()
 ```
 
