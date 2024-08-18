@@ -800,7 +800,7 @@ def parse_elf_dynamic(
         return None
     dyn_items = []
     dyn_items_organize = {}
-    dyn_items_organize['UN_DEFINED'] = []
+    #dyn_items_organize['UN_DEFINED'] = []
     # 如果有不关心,或者未定义的怎么办??? 会被覆盖更新的
 
 
@@ -830,6 +830,8 @@ def parse_elf_dynamic(
             d_tag = dyn_item.d_tag.value.value
             dyn_items.append(dyn_item)
             if dyn_item.d_tag.information == "UN_DEFINED":
+                if 'UN_DEFINED' not in dyn_items_organize:
+                    dyn_items_organize['UN_DEFINED'] = []
                 dyn_items_organize['UN_DEFINED'].append(dyn_item) #不关心的,其他的
             else:
                 dyn_items_organize[dyn_item.d_tag.information] = dyn_item
@@ -918,6 +920,71 @@ def parse_elf_relTable(
     )
 
 
+# 应该不存在一个数据跨越2个区域的吧....
+def __check_isloaded(
+    programs_PT_LOAD: List[Union[ProgramHeader32, ProgramHeader64]],
+    off
+):
+    # 不仅要知道是否可加载,还得知道在哪一个区域
+    load_idx = 0
+    for i in programs_PT_LOAD:
+        if i.p_vaddr.value.value <= off and off  <= i.p_vaddr.value.value + i.p_memsz.value.value :
+            return (True , load_idx)
+        load_idx = load_idx + 1
+
+    return (False, -1)
+def parse_layout_in_program(
+        programs: Dict[str, List[Union[ProgramHeader32, ProgramHeader64]]],
+        dyn_items_organize):
+
+    programs_PT_LOAD = programs['PT_LOAD']
+    # 把要加载的拿出来,然后排序
+    load_list_byprogram = {} # name , offset , size
+    load_list_dtag = {}  # name , offset , size
+
+    for i,j in programs.items():
+        cnt = 0
+        if i == 'PT_LOAD':
+            continue
+        for k in j:
+            (can_load, load_idx) = __check_isloaded(programs_PT_LOAD, k.p_offset.value.value)#k.p_offset是Field类型
+            if can_load == True:
+                if load_idx not in load_list_byprogram:
+                    load_list_byprogram[load_idx] = [] #把 int值作为key, {int: dict}
+                load_list_byprogram[load_idx].append(
+                    {
+                        'name': i + '_$' + str(cnt) if cnt != 0 else i ,
+                        'offset': k.p_vaddr.value,#这是ctype类型
+                    }
+                )
+            cnt = cnt + 1
+        #是否可加载, 最后在排序
+    for d_tag_name , dyn_item in dyn_items_organize.items():
+        # 不同的d_tag对应的d_value还真不知道怎么处理
+        if d_tag_name in ['DT_INIT_ARRAY', 'DT_FINI_ARRAY', 'DT_GNU_HASH', 'DT_STRTAB', \
+                          'DT_SYMTAB','DT_PLTGOT','DT_JMPREL','DT_REL' ,\
+                          'DT_RELA','VERNEED','DT_VERSYM','DT_HASH']:
+            off = dyn_item.d_value
+            (can_load, load_idx) = __check_isloaded(programs_PT_LOAD, off.value)
+            if can_load == True:
+                if load_idx not in load_list_dtag:
+                    load_list_dtag[load_idx] = []
+                load_list_dtag[load_idx].append(
+                    {
+                        'name': d_tag_name,
+                        'offset': off,
+                    }
+                )
+
+    load_list_byprogram = dict(sorted(load_list_byprogram.items(), key=lambda x: x[0]))
+    load_list_dtag = dict(sorted(load_list_dtag.items(), key=lambda x: x[0]))
+
+    for load_idx, load_list_item in load_list_byprogram.items():
+        load_list_byprogram[load_idx] = sorted(load_list_item, key=lambda x: x['offset'].value)
+    for load_idx, load_list_item in load_list_dtag.items():
+        load_list_dtag[load_idx] = sorted(load_list_item, key=lambda x: x['offset'].value)
+    #sorted_list = sorted(load_list, key=lambda x: list(x.values())[0])
+    return [load_list_byprogram,load_list_dtag]
 
 
 
@@ -946,6 +1013,12 @@ def parse_elffile(
         dyn_items,
         dyn_items_organize
     ) = parse_elf_dynamic(file, programs_headers_organize["PT_DYNAMIC"], elf_classe)
+
+
+    # 想知道d_tag对应的数据在哪一个段
+    (load_list_byprogram,load_list_dtag) = parse_layout_in_program (programs_headers_organize,dyn_items_organize)
+
+
 
     # 解析动态符号也需要用到这个
     (
@@ -1013,5 +1086,7 @@ def parse_elffile(
         symbol_items,
         symbol_items_organize,
         Relocation_Tables,
-        Relocation_Tables_organize
+        Relocation_Tables_organize,
+        load_list_byprogram,
+        load_list_dtag
     ]

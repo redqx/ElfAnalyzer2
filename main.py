@@ -1,6 +1,6 @@
 from ElfAnalyzer import *
 
-file = open("test/hello.so.nosec", "rb")
+file = open("test/elfloader", "rb")
 
 # 信息获取
 (
@@ -17,7 +17,9 @@ file = open("test/hello.so.nosec", "rb")
         symbol_items,
         symbol_list,
         Relocation_Tables,
-        Relocation_Tables_organize
+        Relocation_Tables_organize,
+        load_list_byprogram,
+        load_list_dtag
 )=parse_elffile(file)
 
 #查找函数

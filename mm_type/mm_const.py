@@ -176,11 +176,49 @@ class DynamicType(Enum):
     DT_ENCODING = _ConstType(32, "unspecified", "Values interpretation rules")
     DT_PREINIT_ARRAY = _ConstType(32, "pointer", "Pre-initialization functions")
     DT_PREINIT_ARRAYSZ = _ConstType(33, "value", "Pre-init functions size")
-    DT_LOOS = _ConstType(0x6000000D, "unspecified", "System-specific semantics")
-    DT_HIOS = _ConstType(0x6FFFF000, "unspecified", "System-specific semantics")
-    DT_GNU_HASH = _ConstType(0x6FFFFEF5, "pointer", "GNU-style hash table")
-    DT_LOPROC = _ConstType(0x70000000, "unspecified", "Processor-specific semantics")
-    DT_HIPROC = _ConstType(0x7FFFFFFF, "unspecified", "Processor-specific semantics")
+
+    # add
+    DT_LOOS = 0x6000000d
+    DT_HIOS = 0x6ffff000
+    DT_LOPROC = 0x70000000
+    DT_HIPROC = 0x7fffffff
+    DT_VALRNGLO = 0x6ffffd00
+    DT_GNU_PRELINKED = 0x6ffffdf5
+    DT_GNU_CONFLICTSZ =0x6ffffdf6
+    DT_GNU_LIBLISTSZ = 0x6ffffdf7
+    DT_CHECKSUM = 0x6ffffdf8
+    DT_PLTPADSZ = 0x6ffffdf9
+    DT_MOVEENT = 0x6ffffdfa
+    DT_MOVESZ = 0x6ffffdfb
+    DT_FEATURE_1 = 0x6ffffdfc
+    DT_POSFLAG_1 = 0x6ffffdfd
+    DT_SYMINSZ = 0x6ffffdfe
+    DT_SYMINENT = 0x6ffffdff
+    DT_VALRNGHI = 0x6ffffdff
+    DT_ADDRRNGLO = 0x6ffffe00
+    DT_GNU_HASH = 0x6ffffef5
+    DT_TLSDESC_PLT = 0x6ffffef6
+    DT_TLSDESC_GOT = 0x6ffffef7
+    DT_GNU_CONFLICT = 0x6ffffef8
+    DT_GNU_LIBLIST = 0x6ffffef9
+    DT_CONFIG = 0x6ffffefa
+    DT_DEPAUDIT = 0x6ffffefb
+    DT_AUDIT = 0x6ffffefc
+    DT_PLTPAD = 0x6ffffefd
+    DT_MOVETAB = 0x6ffffefe
+    DT_SYMINFO = 0x6ffffeff
+    DT_ADDRRNGHI = 0x6ffffeff
+    DT_VERSYM = 0x6ffffff0
+    DT_RELACOUNT = 0x6ffffff9
+    DT_RELCOUNT = 0x6ffffffa
+    DT_FLAGS_1 = 0x6ffffffb
+    DT_VERDEF = 0x6ffffffc
+    DT_VERDEFNUM = 0x6ffffffd
+    DT_VERNEED = 0x6ffffffe
+    DT_VERNEEDNUM = 0x6fffffff
+    DT_AUXILIARY = 0x7ffffffd
+    DT_FILTER = 0x7fffffff
+
 
 
 class DynamicFlags(Enum):
